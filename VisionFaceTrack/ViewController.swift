@@ -92,8 +92,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             let deviceFormat = format as AVCaptureDevice.Format
             
             let deviceFormatDescription = deviceFormat.formatDescription
-            if deviceFormatDescription.mediaSubType == kCVPixelFormatType_420YpCbCr8BiPlanarFullRange {
-                let candidateDimensions = deviceFormatDescription.videoDimensions
+            if CMFormatDescriptionGetMediaSubType(deviceFormatDescription) == kCVPixelFormatType_420YpCbCr8BiPlanarFullRange {
+                let candidateDimensions = CMVideoFormatDescriptionGetDimensions(deviceFormatDescription)
                 if (highestResolutionFormat == nil) || (candidateDimensions.width > highestResolutionDimensions.width) {
                     highestResolutionFormat = deviceFormat
                     highestResolutionDimensions = candidateDimensions
@@ -459,12 +459,12 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         
         var requestHandlerOptions: [VNImageOption: AnyObject] = [:]
         
-        let cameraIntrinsicData = CMGetAttachment(sampleBuffer, kCMSampleBufferAttachmentKey_CameraIntrinsicMatrix, nil)
+        let cameraIntrinsicData = CMGetAttachment(sampleBuffer, key: kCMSampleBufferAttachmentKey_CameraIntrinsicMatrix, attachmentModeOut: nil)
         if cameraIntrinsicData != nil {
             requestHandlerOptions[VNImageOption.cameraIntrinsics] = cameraIntrinsicData
         }
         
-        guard let pixelBuffer = sampleBuffer.imageBuffer else {
+        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             print("Failed to obtain a CVPixelBuffer for the current output frame.")
             return
         }
