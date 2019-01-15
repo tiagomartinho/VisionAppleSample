@@ -424,9 +424,28 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 let v1 = CGVector(dx: bottom.x - center.x, dy: bottom.y - center.y)
                 let angle = atan2(v2.dy, v2.dx) - atan2(v1.dy, v1.dx)
                 let angleDegrees = angle * CGFloat(180.0 / .pi)
-                print(angleDegrees)
+//                print(angleDegrees)
+            }
+
+            if let points = landmarks.outerLips?.normalizedPoints, !points.isEmpty {
+                let box = boundingBox(points: points, affineTransform: affineTransform)
+//                print(box.height)
+            }
+
+            if let points = landmarks.innerLips?.normalizedPoints, !points.isEmpty {
+                let box = boundingBox(points: points, affineTransform: affineTransform)
+//                print(box.height)
             }
         }
+    }
+
+    private func boundingBox(points: [CGPoint], affineTransform: CGAffineTransform) -> CGRect {
+        let path = CGMutablePath()
+        path.move(to: points[0], transform: affineTransform)
+        path.addLines(between: points, transform: affineTransform)
+        path.addLine(to: points[0], transform: affineTransform)
+        path.closeSubpath()
+        return path.boundingBox
     }
     
     /// - Tag: DrawPaths
