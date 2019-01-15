@@ -399,10 +399,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             
             // Treat eyebrows and lines as open-ended regions when drawing paths.
             let openLandmarkRegions: [VNFaceLandmarkRegion2D?] = [
-                landmarks.leftEyebrow,
-                landmarks.rightEyebrow,
-                landmarks.faceContour,
-                landmarks.noseCrest,
+//                landmarks.faceContour,
                 landmarks.medianLine
             ]
             for openLandmarkRegion in openLandmarkRegions where openLandmarkRegion != nil {
@@ -411,14 +408,23 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             
             // Draw eyes, lips, and nose as closed regions.
             let closedLandmarkRegions: [VNFaceLandmarkRegion2D?] = [
-                landmarks.leftEye,
-                landmarks.rightEye,
                 landmarks.outerLips,
                 landmarks.innerLips,
-                landmarks.nose
             ]
             for closedLandmarkRegion in closedLandmarkRegions where closedLandmarkRegion != nil {
                 self.addPoints(in: closedLandmarkRegion!, to: faceLandmarksPath, applying: affineTransform, closingWhenComplete: true)
+            }
+
+            if let points = landmarks.outerLips?.normalizedPoints,
+                let top = points.first,
+                let center = points.last {
+                let count = points.count
+                let bottom = points[count - 2]
+                let v2 = CGVector(dx: top.x - center.x, dy: top.y - center.y)
+                let v1 = CGVector(dx: bottom.x - center.x, dy: bottom.y - center.y)
+                let angle = atan2(v2.dy, v2.dx) - atan2(v1.dy, v1.dx)
+                let angleDegrees = angle * CGFloat(180.0 / .pi)
+                print(angleDegrees)
             }
         }
     }
