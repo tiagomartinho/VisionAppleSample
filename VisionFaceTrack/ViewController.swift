@@ -417,7 +417,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
             if let points = landmarks.outerLips?.normalizedPoints,
                 let top = points.first,
-                let center = points.last {
+                let center = points.last,
+                points.count > 2 {
                 let count = points.count
                 let bottom = points[count - 2]
                 let v2 = CGVector(dx: top.x - center.x, dy: top.y - center.y)
@@ -435,6 +436,13 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             if let points = landmarks.innerLips?.normalizedPoints, !points.isEmpty {
                 let box = boundingBox(points: points, affineTransform: affineTransform)
 //                print(box.height)
+            }
+
+            if let points = landmarks.medianLine?.normalizedPoints,
+                let first = points.first,
+                let last = points.last {
+                let delta = first.y - last.y
+                print(delta)
             }
         }
     }
